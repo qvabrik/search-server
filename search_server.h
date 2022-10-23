@@ -38,26 +38,25 @@ public:
 
     void AddDocument(int document_id, const std::string_view document, DocumentStatus status, const std::vector<int>& ratings);
 
-    //сортировка итоговых документов по рейтингу и отсечение ТОП-5 документов
-    //принимает запрос и функтор
+    //Г±Г®Г°ГІГЁГ°Г®ГўГЄГ  ГЁГІГ®ГЈГ®ГўГ»Гµ Г¤Г®ГЄГіГ¬ГҐГ­ГІГ®Гў ГЇГ® Г°ГҐГ©ГІГЁГ­ГЈГі ГЁ Г®ГІГ±ГҐГ·ГҐГ­ГЁГҐ Г’ГЋГЏ-5 Г¤Г®ГЄГіГ¬ГҐГ­ГІГ®Гў
+    //ГЇГ°ГЁГ­ГЁГ¬Г ГҐГІ Г§Г ГЇГ°Г®Г± ГЁ ГґГіГ­ГЄГІГ®Г°
     template < typename DocumentPredicate, class ExecutionPolicy>
     std::vector<Document> FindTopDocuments(ExecutionPolicy&& policy, const std::string_view raw_query, const DocumentPredicate& document_predicate) const;
     template< typename DocumentPredicate >
     std::vector<Document> FindTopDocuments(const std::string_view raw_query, const DocumentPredicate& document_predicate) const;
 
-    //FindTopDocuments для одного запроса, в этом случае статус ACTUAL по умолчанию
+    //FindTopDocuments Г¤Г«Гї Г®Г¤Г­Г®ГЈГ® Г§Г ГЇГ°Г®Г±Г , Гў ГЅГІГ®Г¬ Г±Г«ГіГ·Г ГҐ Г±ГІГ ГІГіГ± ACTUAL ГЇГ® ГіГ¬Г®Г«Г·Г Г­ГЁГѕ
     template< class ExecutionPolicy>
     std::vector<Document> FindTopDocuments(ExecutionPolicy&& policy, const std::string_view raw_query) const;
     std::vector<Document> FindTopDocuments(const std::string_view raw_query) const;
 
-    //FindTopDocuments для запроса и определённого статуса
+    //FindTopDocuments Г¤Г«Гї Г§Г ГЇГ°Г®Г±Г  ГЁ Г®ГЇГ°ГҐГ¤ГҐГ«ВёГ­Г­Г®ГЈГ® Г±ГІГ ГІГіГ±Г 
     template< class ExecutionPolicy>
     std::vector<Document> FindTopDocuments(ExecutionPolicy&& policy, const std::string_view raw_query, DocumentStatus required_status) const;
     std::vector<Document> FindTopDocuments(const std::string_view raw_query, DocumentStatus required_status) const;
 
     size_t GetDocumentCount() const;
 
-    //обработка множества слов запроса, распределение на плюс и минус слова с учётом стоп-слов
     std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::string_view raw_query, int document_id) const;
     std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::sequenced_policy&, const std::string_view raw_query, int document_id) const;
     std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::parallel_policy&, const std::string_view raw_query, int document_id) const;
@@ -83,12 +82,12 @@ private:
     };
 
     std::set<std::string, std::less<>> stop_words_;
-    // частота слова в каждом документе
+    // Г·Г Г±ГІГ®ГІГ  Г±Г«Г®ГўГ  Гў ГЄГ Г¦Г¤Г®Г¬ Г¤Г®ГЄГіГ¬ГҐГ­ГІГҐ
     std::unordered_map<std::string_view, std::map<int, double>> word_to_document_freqs_;
-    // частоты каждого слова в документе
+    // Г·Г Г±ГІГ®ГІГ» ГЄГ Г¦Г¤Г®ГЈГ® Г±Г«Г®ГўГ  Гў Г¤Г®ГЄГіГ¬ГҐГ­ГІГҐ
     std::unordered_map<int, std::map<std::string, double, std::less<>>> document_to_words_freqs_;
     std::map<int, DocumentData> documents_;
-    //вектор ids для функций begin и end
+    //ГўГҐГЄГІГ®Г° ids Г¤Г«Гї ГґГіГ­ГЄГ¶ГЁГ© begin ГЁ end
     std::vector<int> ids_;
 
     bool IsStopWord(const std::string_view word) const;
@@ -127,10 +126,10 @@ private:
     Query ParseQuery(const std::string_view text) const;
     Query_vector ParseQuery_Vector(const std::string_view text) const;
 
-    //вычисление IDF
+    //ГўГ»Г·ГЁГ±Г«ГҐГ­ГЁГҐ IDF
     double ComputeWordInverseDocumentFreq(const std::string_view word) const;
 
-    //поиск документов по подготовленному запросу и заданным параметрам
+    //ГЇГ®ГЁГ±ГЄ Г¤Г®ГЄГіГ¬ГҐГ­ГІГ®Гў ГЇГ® ГЇГ®Г¤ГЈГ®ГІГ®ГўГ«ГҐГ­Г­Г®Г¬Гі Г§Г ГЇГ°Г®Г±Гі ГЁ Г§Г Г¤Г Г­Г­Г»Г¬ ГЇГ Г°Г Г¬ГҐГІГ°Г Г¬
     template <typename Container, typename It, typename DocumentPredicate>
     void ComputeDocumentRelevance(Container& result_container, It range_begin, It range_end, DocumentPredicate document_predicate) const;
     template <typename DocumentPredicate>
@@ -193,13 +192,13 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string_view raw_
     return FindTopDocuments(std::execution::seq, raw_query, document_predicate);
 }
 
-//FindTopDocuments для одного запроса, в этом случае статус ACTUAL по умолчанию
+//FindTopDocuments Г¤Г«Гї Г®Г¤Г­Г®ГЈГ® Г§Г ГЇГ°Г®Г±Г , Гў ГЅГІГ®Г¬ Г±Г«ГіГ·Г ГҐ Г±ГІГ ГІГіГ± ACTUAL ГЇГ® ГіГ¬Г®Г«Г·Г Г­ГЁГѕ
 template< class ExecutionPolicy >
 std::vector<Document> SearchServer::FindTopDocuments(ExecutionPolicy&& policy, const std::string_view raw_query) const {
     return FindTopDocuments(policy, raw_query, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; });
 }
 
-//FindTopDocuments для запроса и определённого статуса
+//FindTopDocuments Г¤Г«Гї Г§Г ГЇГ°Г®Г±Г  ГЁ Г®ГЇГ°ГҐГ¤ГҐГ«ВёГ­Г­Г®ГЈГ® Г±ГІГ ГІГіГ±Г 
 template< class ExecutionPolicy>
 std::vector<Document> SearchServer::FindTopDocuments(ExecutionPolicy&& policy, const std::string_view raw_query, DocumentStatus required_status) const {
     return FindTopDocuments(policy, raw_query, [required_status](int document_id, DocumentStatus status, int rating) { return status == required_status; });
